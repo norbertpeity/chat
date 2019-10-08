@@ -1,40 +1,96 @@
-/* create a wrapper to keep the global namespace pollution minimal */
-const chat = ( function() {
-    /* cache the frequently used DOM elements */
-    const cache = {
-        messages: document.querySelector('.js-chat-messages'),
-        controls: document.querySelector('.js-chat-controls'),
-        nickname: document.querySelector('.js-chat-nickname'),
-        input: document.querySelector('.js-chat-input'),
-        send: document.querySelector('.js-chat-send'),
-    };
+class Chat {
+    constructor() {
+        // cache some commonly used DOM elements
+        this.cache = {
+            messagesWrapper: document.querySelector('.js-chat-messages-wrapper'),
+            messages: document.querySelector('.js-chat-messages'),
+            notification: document.querySelector('.js-chat-notification'),
+            controls: document.querySelector('.js-chat-controls'),
+            nickname: document.querySelector('.js-chat-nickname'),
+            input: document.querySelector('.js-chat-input'),
+            send: document.querySelector('.js-chat-send'),
+        };
 
-    // const inputs = ['nickname', 'input'];
-    // const focusClass = 'chat__controls--focus-';
-    // const focusedInputClasses = inputs.map(inputName => `${focusClass}${inputName}`);
-    // console.log(focusedInputClasses);
+        this.nickname = '';
 
-    // function handleInputFocus(target) {
-    //     console.log('focused', target);
-    //     cache.controls.classList.remove(...focusedInputClasses);
-    //     cache.controls.classList.add(`${focusClass}${target}`);
-    // }
+        // listen to changes on the nickname input
+        this.cache.nickname.addEventListener('change', (e) => {
+            this.nickname = e.target.value;
+        });
 
-    // function handleInputBlur(target) {
-    //     console.log('blurred', target);
-    //     cache.controls.classList.remove(`${focusClass}${target}`);
-    // }
+        // listen to send button clicks and enter keypresses in the input
+        this.cache.send.addEventListener('click', () => this.validateNickname());
+        this.cache.input.addEventListener('keyup', (e) => {
+            if (e.which === 13) {
+                this.validateNickname();
+            }
+        });
 
-    return {
-        init: function() {
-            console.log('initiating the chat app');
-            /* Make the text inputs wider when they are in focus */
-            // inputs.forEach(inputName => {
-            //     cache[inputName].addEventListener('focus', () => { handleInputFocus(inputName) });
-            //     cache[inputName].addEventListener('blur', () => { handleInputBlur(inputName) });
-            // });
+        // initialize socket.io
+        this.socket = io('http://35.157.80.184:8080/');
+        this.socket.on('message', response => this.handleResponse(response));
+    }
+
+    validateNickname() {
+        if (this.nickname.length > 0) {
+            this.validateNewMessage();
+        }
+        else {
+            this.setNotification('Please set your nickname to start chatting!');
         }
     }
-})();
 
-chat.init();
+    // validate input, add it to the messages array if everything is okay
+    // then empty the input and re-focus it so the user can keep typing
+    validateNewMessage() {
+        if (this.cache.input.value.length > 0) {
+            const message = {
+                message: this.cache.input.value,
+                user: this.nickname,
+            };
+            this.cache.input.value = '';
+            this.cache.input.focus();
+            
+            this.socket.emit('message', message);
+            this.addMessage(message);
+        }
+    }
+
+    addMessage(message) {
+        const newMessage = document.createElement('div');
+        newMessage.classList.add('chat__message');
+        if (message.user === this.nickname) {
+            newMessage.classList.add('chat__message--reply');
+        }
+        else {
+            newMessage.textContent = message.user + ': ';
+        }
+
+        newMessage.textContent += message.message;
+        this.cache.messages.appendChild(newMessage);
+        this.cache.messagesWrapper.scrollTop = this.cache.messagesWrapper.scrollHeight;
+    }
+
+    handleResponse(message) {
+        if (message.user !== this.nickname) {
+            this.addMessage(message);
+        }
+    }
+
+    setNotification(message) {
+        this.cache.notification.textContent = message;
+        this.cache.notification.classList.add('chat__notification--show');
+
+        setTimeout(() => this.cache.notification.classList.remove('chat__notification--show'), 3000);
+    }
+}
+
+const chat = new Chat();
+
+// for debugging purposes
+// setInterval(() => {
+//     chat.addMessage({
+//         message: 'Auto generated message',
+//         user: 'bot',
+//     });
+// }, 1000);
