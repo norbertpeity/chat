@@ -11,14 +11,15 @@ class Chat {
             send: document.querySelector('.js-chat-send'),
         };
 
-        this.nickname = '';
+        this.nickname = 'Guest';
+        this.firstMessage = true; // this is used to clear the 'start chatting' message
+
+        this.cache.nickname.value = this.nickname; // set the nickname input value to the default nickname
 
         // listen to changes on the nickname input
-        this.cache.nickname.addEventListener('change', (e) => {
-            this.nickname = e.target.value;
-        });
+        this.cache.nickname.addEventListener('change', (e) => this.nickname = e.target.value);
 
-        // listen to send button clicks and enter keypresses in the input
+        // listen to send button clicks and enter keypresses on the input
         this.cache.send.addEventListener('click', () => this.validateNickname());
         this.cache.input.addEventListener('keyup', (e) => {
             if (e.which === 13) {
@@ -31,16 +32,18 @@ class Chat {
         this.socket.on('message', response => this.handleResponse(response));
     }
 
+    // check if the nickname is empty or not
     validateNickname() {
         if (this.nickname.length > 0) {
             this.validateNewMessage();
         }
         else {
             this.setNotification('Please set your nickname to start chatting!');
+            this.cache.nickname.focus();
         }
     }
 
-    // validate input, add it to the messages array if everything is okay
+    // validate input, and send it to the socket.io server if it's not empty
     // then empty the input and re-focus it so the user can keep typing
     validateNewMessage() {
         if (this.cache.input.value.length > 0) {
@@ -50,33 +53,43 @@ class Chat {
             };
             this.cache.input.value = '';
             this.cache.input.focus();
-            
+
             this.socket.emit('message', message);
-            this.addMessage(message);
         }
     }
 
+    // add the message to the DOM
     addMessage(message) {
+        if (this.firstMessage) {
+            this.firstMessage = false;
+            this.cache.messages.innerHTML = '';
+        }
+
         const newMessage = document.createElement('div');
         newMessage.classList.add('chat__message');
+
+        // add an extra class to the div for styling purposes if current user is the sender
         if (message.user === this.nickname) {
             newMessage.classList.add('chat__message--reply');
         }
+        // otherwise prepend the name of the user to the message
         else {
             newMessage.textContent = message.user + ': ';
         }
 
         newMessage.textContent += message.message;
         this.cache.messages.appendChild(newMessage);
+
+        // scroll the user to the bottom of the message container
         this.cache.messagesWrapper.scrollTop = this.cache.messagesWrapper.scrollHeight;
     }
 
+    // handle messages arriving through socket.io
     handleResponse(message) {
-        if (message.user !== this.nickname) {
-            this.addMessage(message);
-        }
+        this.addMessage(message);
     }
 
+    // display a notification for 3 seconds
     setNotification(message) {
         this.cache.notification.textContent = message;
         this.cache.notification.classList.add('chat__notification--show');
