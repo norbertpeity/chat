@@ -1,12 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Chat</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
-    
+
+    <div class="chat">
+        <div class="chat__messages-wrapper js-chat-messages-wrapper">
+            <div class="chat__messages js-chat-messages">
+                <div class="chat__message">Type your message and start chatting!</div>
+            </div>
+        </div>
+        <div class="chat__notification js-chat-notification"></div>
+        <form action="" method="post" class="chat__controls js-chat-controls">
+            <input type="text" class="chat__nickname js-chat-nickname" placeholder="Nickname" />
+            <input type="text" class="chat__input js-chat-input" placeholder="Type here to chat" />
+            <button type="button" class="chat__send js-chat-send">Send</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,151 @@
+:root {
+    --primaryColor: #000;
+    --secondaryColor: #00f;
+    --textOnPrimary: #fff;
+    --textOnSecondary: #fff;
+    --errorColor: #f00;
+    --errorTextColor: #fff;
+    --scrollbarBg: #ccc;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-family: Lato, sans-serif;
+    font-size: 1.6rem;
+    line-height: 1.4;
+    margin: .5rem;
+}
+
+input[type=text],
+button {
+    font-family: Lato, sans-serif;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+input[type=text] {
+    border: 1px solid var(--primaryColor);
+    transition: border-color .3s ease;
+    padding: 0 .5rem;
+}
+
+input[type=text]:focus {
+    border-color: var(--secondaryColor);
+    outline: none;
+}
+
+.chat {
+    border: 1px solid var(--primaryColor);
+    margin: 0 auto;
+    max-width: 100%;
+    padding: .5rem;
+    position: relative;
+    width: 30rem;
+}
+
+@media (min-width: 768px) {
+    .chat {
+        margin-top: 10rem;
+    }
+}
+
+.chat__messages-wrapper {
+    height: 50rem;
+    margin-bottom: 1rem;
+    padding: 0 .5rem;
+    overflow: auto;
+}
+
+.chat__messages-wrapper::-webkit-scrollbar-track {
+    background-color: var(--scrollbarBg);
+}
+
+.chat__messages-wrapper::-webkit-scrollbar {
+    width: 10px;
+    background-color: var(--scrollbarBg);
+}
+
+.chat__messages-wrapper::-webkit-scrollbar-thumb {
+    background-color: var(--primaryColor);
+}
+
+.chat__messages {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 50rem;
+}
+
+.chat__message {
+    padding: 1rem 0;
+}
+
+.chat__message:first-child {
+    padding-top: 0;
+}
+
+.chat__message:last-child {
+    padding-bottom: 0;
+}
+
+.chat__message--reply {
+    align-self: flex-end;
+    text-align: right;
+}
+
+.chat__notification {
+    background-color: var(--errorColor);
+    color: var(--errorTextColor);
+    display: none;
+    padding: .5rem 1rem;
+    position: absolute;
+    bottom: 4.7rem;
+    left: .5rem;
+    right: .5rem;
+}
+
+.chat__notification--show {
+    display: block;
+}
+
+.chat__controls {
+    display: flex;
+}
+
+.chat__nickname {
+    flex: 1 1 auto;
+    height: 3.2rem;
+    width: 6rem;
+}
+
+.chat__input {
+    flex: 1 1 auto;
+    height: 3.2rem;
+    margin: 0 .5rem;
+    width: 16rem;
+}
+
+.chat__send {
+    background-color: var(--primaryColor);
+    border: none;
+    color: var(--textOnPrimary);
+    cursor: pointer;
+    flex: 0 0 auto;
+    padding: .8rem 1rem;
+    text-transform: uppercase;
+    transition: background-color .3s ease;
+    width: 6rem;
+}
+
+.chat__send:hover {
+    background-color: var(--secondaryColor);
+}
