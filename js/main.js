@@ -29,7 +29,7 @@ class Chat {
 
         // initialize socket.io
         this.socket = io('http://35.157.80.184:8080/');
-        this.socket.on('message', response => this.handleResponse(response));
+        this.socket.on('message', response => this.addMessage(response));
     }
 
     // check if the nickname is empty or not
@@ -84,11 +84,6 @@ class Chat {
         this.cache.messagesWrapper.scrollTop = this.cache.messagesWrapper.scrollHeight;
     }
 
-    // handle messages arriving through socket.io
-    handleResponse(message) {
-        this.addMessage(message);
-    }
-
     // display a notification for 3 seconds
     setNotification(message) {
         this.cache.notification.textContent = message;
@@ -99,11 +94,3 @@ class Chat {
 }
 
 const chat = new Chat();
-
-// for debugging purposes
-// setInterval(() => {
-//     chat.addMessage({
-//         message: 'Auto generated message',
-//         user: 'bot',
-//     });
-// }, 1000);
